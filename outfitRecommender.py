@@ -6,6 +6,11 @@ import os
 from os import listdir
 import Tkinter as tk
 import cv2
+from colormath.color_objects import sRGBColor, AdobeRGBColor, LabColor
+from colormath.color_conversions import convert_color
+from colormath.color_diff import delta_e_cie2000
+from operator import itemgetter
+
 
 # Einlesen Bilder
 scriptPath = os.path.dirname(__file__)
@@ -17,6 +22,7 @@ filenamesTrousers = listdir(os.path.join(scriptPath,'data/trousers'))
 filenamesTop = listdir(os.path.join(scriptPath,'data/top'))
 filenamesShoes = listdir(os.path.join(scriptPath,'data/shoes'))
 filenamesJacket = listdir(os.path.join(scriptPath,'data/jacket'))
+
 
 def getAvgColor(name,image):
     # Zählt keine Weißen Pixel (Hintergrund) mit
@@ -35,14 +41,17 @@ def getAvgColor(name,image):
                 totalB = totalB + pixel[0]
                 totalPixel = totalPixel +1
 
-    avgPixel = []
-    avgPixel.append(name)
-    avgPixel.append(totalR / totalPixel)
-    avgPixel.append(totalG / totalPixel)
-    avgPixel.append(totalB / totalPixel)
 
-    return avgPixel
+    avGColorRgb = sRGBColor((totalR / totalPixel) / 255., (totalG / totalPixel) / 255., (totalB / totalPixel) / 255.);
+
+    avgColorLab = []
+  
+    avgColorLab.append(name)
+    avgColorLab.append(convert_color(avGColorRgb, LabColor))
     
+    
+    return avgColorLab
+
 for img in filenamesTrousers:
     image = cv2.imread(os.path.join(scriptPath,'data/trousers',img))
     imagesCompiledTrousers.append(getAvgColor(img, image))
@@ -59,12 +68,80 @@ for img in filenamesJacket:
     image = cv2.imread(os.path.join(scriptPath,'data/jacket',img))
     imagesCompiledJacket.append(getAvgColor(img, image))
 
-print(imagesCompiledJacket)
-print(imagesCompiledTop)
-print(imagesCompiledShoes)
-print(imagesCompiledJacket)
 
-# Convert Average Colors from RGB into Lab Color Space for better 
-# similarity measure (delta e distance measure between colors in 3D space)
-#
-#newCol = cv2.cvtColor(np.array([160,160,160]), cv2.COLOR_BGR2LAB)
+def getClosestTrousers(imgName):
+    referenceColor = {}
+    deltaEValues = []
+    
+    for img in imagesCompiledTrousers:
+        if(img[0] == imgName):
+            referenceColor = img[1]
+
+    for img in imagesCompiledTrousers:
+        image = []
+        image.append(img[0])
+        image.append(delta_e_cie2000(referenceColor, img[1]))
+        deltaEValues.append(image)
+        
+    deltaEValues.sort(key=itemgetter(1))   
+
+    return deltaEValues[1:4]
+        
+def getClosestShoes(imgName):
+    referenceColor = {}
+    deltaEValues = []
+    
+    for img in imagesCompiledShoes:
+        if(img[0] == imgName):
+            referenceColor = img[1]
+
+    for img in imagesCompiledShoes:
+        image = []
+        image.append(img[0])
+        image.append(delta_e_cie2000(referenceColor, img[1]))
+        deltaEValues.append(image)
+        
+    deltaEValues.sort(key=itemgetter(1))   
+
+    return deltaEValues[1:4]
+
+def getClosestJacket(imgName):
+    referenceColor = {}
+    deltaEValues = []
+    
+    for img in imagesCompiledJacket:
+        if(img[0] == imgName):
+            referenceColor = img[1]
+
+    for img in imagesCompiledJacket:
+        image = []
+        image.append(img[0])
+        image.append(delta_e_cie2000(referenceColor, img[1]))
+        deltaEValues.append(image)
+        
+    deltaEValues.sort(key=itemgetter(1))   
+
+    return deltaEValues[1:4]
+
+def getClosestTop(imgName):
+    referenceColor = {}
+    deltaEValues = []
+    
+    for img in imagesCompiledTop:
+        if(img[0] == imgName):
+            referenceColor = img[1]
+
+    for img in imagesCompiledTop:
+        image = []
+        image.append(img[0])
+        image.append(delta_e_cie2000(referenceColor, img[1]))
+        deltaEValues.append(image)
+        
+    deltaEValues.sort(key=itemgetter(1))   
+
+    return deltaEValues[1:4]
+
+print(getClosestTrousers('chino-grau-street-one.jpg'))
+print(getClosestShoes('ballerinas-in-metallicoptik-silber-buffalo_list.jpg'))
+print(getClosestJacket('blazer-mit-kurzform-grau-b-c-best-connections-by-heine.jpg'))
+print(getClosestTop('bluse-mit-muster-weiss-orsay.jpg'))
