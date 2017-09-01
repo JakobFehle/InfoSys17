@@ -69,13 +69,8 @@ for img in filenamesJacket:
     imagesCompiledJacket.append(getAvgColor(img, image))
 
 
-def getClosestTrousers(imgName):
-    referenceColor = {}
+def getClosestTrousers(referenceColor):
     deltaEValues = []
-    
-    for img in imagesCompiledTrousers:
-        if(img[0] == imgName):
-            referenceColor = img[1]
 
     for img in imagesCompiledTrousers:
         image = []
@@ -85,15 +80,10 @@ def getClosestTrousers(imgName):
         
     deltaEValues.sort(key=itemgetter(1))   
 
-    return deltaEValues[1:4]
+    return deltaEValues[0:3]
         
-def getClosestShoes(imgName):
-    referenceColor = {}
+def getClosestShoes(referenceColor):
     deltaEValues = []
-    
-    for img in imagesCompiledShoes:
-        if(img[0] == imgName):
-            referenceColor = img[1]
 
     for img in imagesCompiledShoes:
         image = []
@@ -103,16 +93,11 @@ def getClosestShoes(imgName):
         
     deltaEValues.sort(key=itemgetter(1))   
 
-    return deltaEValues[1:4]
+    return deltaEValues[0:3]
 
-def getClosestJacket(imgName):
-    referenceColor = {}
+def getClosestJacket(referenceColor):
     deltaEValues = []
     
-    for img in imagesCompiledJacket:
-        if(img[0] == imgName):
-            referenceColor = img[1]
-
     for img in imagesCompiledJacket:
         image = []
         image.append(img[0])
@@ -121,16 +106,11 @@ def getClosestJacket(imgName):
         
     deltaEValues.sort(key=itemgetter(1))   
 
-    return deltaEValues[1:4]
+    return deltaEValues[0:3]
 
-def getClosestTop(imgName):
-    referenceColor = {}
+def getClosestTop(referenceColor):
     deltaEValues = []
     
-    for img in imagesCompiledTop:
-        if(img[0] == imgName):
-            referenceColor = img[1]
-
     for img in imagesCompiledTop:
         image = []
         image.append(img[0])
@@ -139,9 +119,47 @@ def getClosestTop(imgName):
         
     deltaEValues.sort(key=itemgetter(1))   
 
-    return deltaEValues[1:4]
+    return deltaEValues[0:3]
 
-print(getClosestTrousers('chino-grau-street-one.jpg'))
-print(getClosestShoes('ballerinas-in-metallicoptik-silber-buffalo_list.jpg'))
-print(getClosestJacket('blazer-mit-kurzform-grau-b-c-best-connections-by-heine.jpg'))
-print(getClosestTop('bluse-mit-muster-weiss-orsay.jpg'))
+#gets invoked from the UI
+def getNextCloth(cloth, imgName, wantedCloth):
+    referenceColor = {}
+    if(cloth == 'top'):
+        for img in imagesCompiledTop:
+            if(img[0] == imgName):
+                referenceColor = img[1]
+
+    elif(cloth == 'jacket'):
+        for img in imagesCompiledJacket:
+            if(img[0] == imgName):
+                referenceColor = img[1]
+    
+    elif(cloth == 'trousers'):
+        for img in imagesCompiledTrousers:
+            if(img[0] == imgName):
+                referenceColor = img[1]
+                print(img)
+                
+    elif(cloth == 'shoes'):
+        for img in imagesCompiledShoes:
+            if(img[0] == imgName):
+                referenceColor = img[1]
+
+    if(wantedCloth == 'top'):
+        return getClosestTop(referenceColor)
+    
+    elif(wantedCloth == 'jacket'):
+        return getClosestJacket(referenceColor)
+        
+    elif(wantedCloth == 'trousers'):
+        return getClosestTrousers(referenceColor)
+        
+    elif(wantedCloth == 'shoes'):
+        return getClosestShoes(referenceColor)
+    
+        
+    
+    
+print(getNextCloth('trousers','chino-grau-street-one.jpg','shoes'))
+print(getNextCloth('trousers','chino-grau-street-one.jpg','top'))
+print(getNextCloth('trousers','chino-grau-street-one.jpg','jacket'))
