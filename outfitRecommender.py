@@ -41,6 +41,7 @@ def getAvgColor(name, image):
 
     avgColorRgb = sRGBColor((totalR / totalPixel) / 255., (totalG / totalPixel) / 255., (totalB / totalPixel) / 255.);
     avgColorLab = []
+    print(name, avgColorRgb)
 
     avgColorLab.append(name)
     avgColorLab.append(convert_color(avgColorRgb, LabColor))
@@ -156,6 +157,6 @@ def getNextCloth(cloth, imgName, wantedCloth):
     elif (wantedCloth == 'shoes'):
         return getClosestShoes(referenceColor)
 
-print(getNextCloth('trousers', 'chino-grau-street-one.jpg', 'shoes'))
+# print(getNextCloth('trousers', 'chino-grau-street-one.jpg', 'shoes'))
 # print(getNextCloth('trousers','chino-grau-street-one.jpg','top'))
 # print(getNextCloth('trousers','chino-grau-street-one.jpg','jacket'))
