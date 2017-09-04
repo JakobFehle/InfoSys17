@@ -19,6 +19,8 @@ filenamesTrousers = listdir(os.path.join(scriptPath, 'data/trousers'))
 filenamesTop = listdir(os.path.join(scriptPath, 'data/top'))
 filenamesShoes = listdir(os.path.join(scriptPath, 'data/shoes'))
 filenamesJacket = listdir(os.path.join(scriptPath, 'data/jacket'))
+# used for dynamically accessing the four cloth lists
+filenames = [filenamesTop, filenamesJacket, filenamesTrousers, filenamesShoes]
 
 
 def getAvgColor(name, image):
@@ -154,6 +156,6 @@ def getNextCloth(cloth, imgName, wantedCloth):
     elif (wantedCloth == 'shoes'):
         return getClosestShoes(referenceColor)
 
-# print(getNextCloth('trousers','chino-grau-street-one.jpg','shoes'))
+# print(getNextCloth('trousers', 'chino-grau-street-one.jpg', 'shoes'))
 # print(getNextCloth('trousers','chino-grau-street-one.jpg','top'))
 # print(getNextCloth('trousers','chino-grau-street-one.jpg','jacket'))
