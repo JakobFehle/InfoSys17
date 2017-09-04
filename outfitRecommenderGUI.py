@@ -3,7 +3,7 @@
 
 import Tkinter as tk
 import tkMessageBox
-from PIL import ImageTk
+from PIL import Image, ImageTk
 import outfitRecommender
 
 
@@ -22,9 +22,9 @@ class OutfitRecommenderGUI(tk.Frame):
         # Initializing the buttons representing the cloth pieces
         for j in range(len(outfitRecommender.filenames)):
             for k in range(len(outfitRecommender.filenames[j])):
-                print (outfitRecommender.filenames)
-                self.buttonImages[(j, k)] = ImageTk.PhotoImage(
-                    file=self.filenamePrefixes[j] + outfitRecommender.filenames[j][k])
+                self.original = Image.open(self.filenamePrefixes[j] + outfitRecommender.filenames[j][k])
+                resized = self.original.resize((160, 160), Image.ANTIALIAS)
+                self.buttonImages[(j, k)] = ImageTk.PhotoImage(resized)
 
         # The first four cloth pieces to be shown // buttons need to safe the path to the image for correct behaviour
         self.startScreenButtons = [self.buttonImages[(0, 0)], self.buttonImages[(1, 0)], self.buttonImages[(2, 0)],
@@ -124,8 +124,9 @@ class OutfitRecommenderGUI(tk.Frame):
             r = 0
         print (next_cloth)
         for k in range(len(next_cloth)):
-            self.recommendedImages[(r, k)] = ImageTk.PhotoImage(
-                file=self.filenamePrefixes[r] + next_cloth[k][0])
+            self.original = Image.open(self.filenamePrefixes[r] + next_cloth[k][0])
+            resized = self.original.resize((160, 160), Image.ANTIALIAS)
+            self.recommendedImages[(r, k)] = ImageTk.PhotoImage(resized)
             self.buttons[(r, k)] = tk.Button(self, width=160, height=160,
                                              image=self.recommendedImages[(r, k)],
                                              state="normal")
