@@ -156,6 +156,6 @@ def getNextCloth(cloth, imgName, wantedCloth):
     elif (wantedCloth == 'shoes'):
         return getClosestShoes(referenceColor)
 
-# print(getNextCloth('trousers', 'chino-grau-street-one.jpg', 'shoes'))
+print(getNextCloth('trousers', 'chino-grau-street-one.jpg', 'shoes'))
 # print(getNextCloth('trousers','chino-grau-street-one.jpg','top'))
 # print(getNextCloth('trousers','chino-grau-street-one.jpg','jacket'))
