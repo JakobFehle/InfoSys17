@@ -4,28 +4,21 @@
 import Tkinter as tk
 import tkMessageBox
 from PIL import ImageTk
-import os
-from os import listdir
+import outfitRecommender
 
 
 class OutfitRecommenderGUI(tk.Frame):
     buttonBackground = "#000000"
     fieldWidth = 25
-    scriptPath = os.path.dirname(__file__)
-    fileNamesTop = listdir(os.path.join(scriptPath, 'data/top'))
-    fileNamesJacket = listdir(os.path.join(scriptPath, 'data/jacket'))
-    fileNamesTrousers = listdir(os.path.join(scriptPath, 'data/trousers'))
-    fileNamesShoes = listdir(os.path.join(scriptPath, 'data/shoes'))
 
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-
         # Initializing the buttons for the start-screen
-        self.topButton = ImageTk.PhotoImage(file="data/top/" + self.fileNamesTop[0])
-        self.jacketButton = ImageTk.PhotoImage(file="data/jacket/" + self.fileNamesJacket[0])
-        self.trouserButton = ImageTk.PhotoImage(file="data/trousers/" + self.fileNamesTrousers[0])
-        self.shoeButton = ImageTk.PhotoImage(file="data/shoes/" + self.fileNamesShoes[0])
+        self.topButton = ImageTk.PhotoImage(file="data/top/" + outfitRecommender.filenamesTop[0])
+        self.jacketButton = ImageTk.PhotoImage(file="data/jacket/" + outfitRecommender.filenamesJacket[0])
+        self.trouserButton = ImageTk.PhotoImage(file="data/trousers/" + outfitRecommender.filenamesTrousers[0])
+        self.shoeButton = ImageTk.PhotoImage(file="data/shoes/" + outfitRecommender.filenamesShoes[0])
 
         self.startScreenButtons = [self.topButton, self.jacketButton, self.trouserButton, self.shoeButton]
 
@@ -87,7 +80,7 @@ class OutfitRecommenderGUI(tk.Frame):
         # fills the grid with buttons
         for j in range(r):
             for k in range(c):
-                self.buttons[(j, k)] = tk.Button(self, width=175, height=175, image=self.startScreenButtons[j],
+                self.buttons[(j, k)] = tk.Button(self, width=160, height=160, image=self.startScreenButtons[j],
                                                  state="normal")
                 b = self.buttons[(j, k)]
                 # b.image = self.startScreenButtons[0]
