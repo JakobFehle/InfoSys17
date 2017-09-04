@@ -110,6 +110,9 @@ class OutfitRecommenderGUI(tk.Frame):
 
         self.pack()
 
+    # used to save the recommended images, they won't be shown otherwise // dirty workaround
+    recommendedImages = {}
+
     def show_recommendations(self, r, c):
         if r != 3:
             next_cloth = outfitRecommender.getNextCloth(self.clothNames[r], outfitRecommender.filenames[r][c],
@@ -121,9 +124,10 @@ class OutfitRecommenderGUI(tk.Frame):
             r = 0
         print (next_cloth)
         for k in range(len(next_cloth)):
+            self.recommendedImages[(r, k)] = ImageTk.PhotoImage(
+                file=self.filenamePrefixes[r] + next_cloth[k][0])
             self.buttons[(r, k)] = tk.Button(self, width=160, height=160,
-                                             image=ImageTk.PhotoImage(
-                                                 file=self.filenamePrefixes[r] + next_cloth[k][0]),
+                                             image=self.recommendedImages[(r, k)],
                                              state="normal")
             b = self.buttons[(r, k)]
             b.grid(row=r, column=k, padx=(10, 10), pady=(10, 10))
