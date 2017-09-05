@@ -9,27 +9,35 @@ from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
 from operator import itemgetter
 
-# Einlesen Bilder
+# Import images
+
+# Set script path dynamically
 scriptPath = os.path.dirname(__file__)
+
+# Saving compiled images here (name + deltaE)
 imagesCompiledTrousers = []
 imagesCompiledTop = []
 imagesCompiledShoes = []
 imagesCompiledJacket = []
+
+# Load all Filenames of the specific folders
 filenamesTrousers = listdir(os.path.join(scriptPath, 'data/trousers'))
 filenamesTop = listdir(os.path.join(scriptPath, 'data/top'))
 filenamesShoes = listdir(os.path.join(scriptPath, 'data/shoes'))
 filenamesJacket = listdir(os.path.join(scriptPath, 'data/jacket'))
+
 # used for dynamically accessing the four cloth lists
 filenames = [filenamesTop, filenamesJacket, filenamesTrousers, filenamesShoes]
 
-
+# Computes the average color of the image and converts it to the LAB-colorspace
 def getAvgColor(name, image):
-    # Zählt keine Weißen Pixel (Hintergrund) mit
+
     totalR = 0
     totalG = 0
     totalB = 0
     totalPixel = 0
 
+    # Adds up all R,G and B values while ignoring background-white colors
     for pixel in image:
         if pixel[0] > 245 and pixel[1] > 245 and pixel[2] > 245:
             continue
@@ -39,16 +47,17 @@ def getAvgColor(name, image):
             totalB = totalB + pixel[2]
             totalPixel = totalPixel + 1
 
+    # Computes avg RGB Color of the image
     avgColorRgb = sRGBColor((totalR / totalPixel) / 255., (totalG / totalPixel) / 255., (totalB / totalPixel) / 255.);
+    
+    # Converts RGB to LAB Colorspace
     avgColorLab = []
-    # print(name, avgColorRgb)
-
     avgColorLab.append(name)
     avgColorLab.append(convert_color(avgColorRgb, LabColor))
 
     return avgColorLab
 
-
+# Loads all images of the specific category, computes the avg color value and converts it to LAB-colorspace
 for img in filenamesTrousers:
     image = Image.open(os.path.join(scriptPath, 'data/trousers', img))
     imagesCompiledTrousers.append(getAvgColor(img, list(image.getdata())))
@@ -66,6 +75,7 @@ for img in filenamesJacket:
     imagesCompiledJacket.append(getAvgColor(img, list(image.getdata())))
 
 
+# Computes the deltaE Values between a referenceColor and one cloth-category
 def getClosestTrousers(referenceColor):
     deltaEValues = []
 
@@ -122,7 +132,9 @@ def getClosestTop(referenceColor):
     return deltaEValues[0:3]
 
 
-# gets invoked from the UI
+# "Wrapper" for the outfit-recommender and interface for the UI
+# Gets invoked with the name and category of the user-picked cloth and
+# the category for which the three closest neighbours should be returned
 def getNextCloth(cloth, imgName, wantedCloth):
     referenceColor = {}
     if (cloth == 'top'):
@@ -156,7 +168,3 @@ def getNextCloth(cloth, imgName, wantedCloth):
 
     elif (wantedCloth == 'shoes'):
         return getClosestShoes(referenceColor)
-
-# print(getNextCloth('trousers', 'chino-grau-street-one.jpg', 'shoes'))
-# print(getNextCloth('trousers','chino-grau-street-one.jpg','top'))
-# print(getNextCloth('trousers','chino-grau-street-one.jpg','jacket'))
