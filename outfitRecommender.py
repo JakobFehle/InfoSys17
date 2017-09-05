@@ -41,7 +41,7 @@ def getAvgColor(name, image):
 
     avgColorRgb = sRGBColor((totalR / totalPixel) / 255., (totalG / totalPixel) / 255., (totalB / totalPixel) / 255.);
     avgColorLab = []
-    print(name, avgColorRgb)
+    # print(name, avgColorRgb)
 
     avgColorLab.append(name)
     avgColorLab.append(convert_color(avgColorRgb, LabColor))

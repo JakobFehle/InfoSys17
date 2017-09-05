@@ -19,7 +19,7 @@ class OutfitRecommenderGUI(tk.Frame):
     # used to save all the default button images
     buttonImages = {}
 
-    # used to save the recommended images, they won't be shown otherwise // dirty workaround
+    # used to save the recommended images, they won't be shown otherwise
     recommendedImages = {}
 
     def __init__(self, root):
@@ -39,15 +39,16 @@ class OutfitRecommenderGUI(tk.Frame):
     def __initButtonImages__(self):
         for j in range(len(outfitRecommender.filenames)):
             for k in range(len(outfitRecommender.filenames[j])):
-                image_path = self.filenamePrefixes[j] + outfitRecommender.filenames[j][k]
-                self.original = Image.open(image_path)
-                resized = self.original.resize((self.buttonSize, self.buttonSize), Image.ANTIALIAS)
-                self.buttonImages[(j, k)] = ImageTk.PhotoImage(resized)
+                image_path_prefix = self.filenamePrefixes[j]
+                image_path = outfitRecommender.filenames[j][k]
+                original = Image.open(image_path_prefix + image_path)
+                resized = original.resize((self.buttonSize, self.buttonSize), Image.ANTIALIAS)
+                self.buttonImages[(j, k)] = [ImageTk.PhotoImage(resized), image_path_prefix, image_path]
 
         # The first four cloth pieces to be shown (representing the four different cloth types)
         # Is needed, because buttons need to save the path to the image for correct behaviour
-        self.startScreenButtons = [self.buttonImages[(0, 0)], self.buttonImages[(1, 0)], self.buttonImages[(2, 0)],
-                                   self.buttonImages[(3, 0)]]
+        self.startScreenButtonImages = [self.buttonImages[(0, 0)], self.buttonImages[(1, 0)], self.buttonImages[(2, 0)],
+                                        self.buttonImages[(3, 0)]]
 
     # Sets up the window and its menu-bar
     def __initUI__(self):
@@ -117,7 +118,7 @@ class OutfitRecommenderGUI(tk.Frame):
         for j in range(row):
             for k in range(col):
                 self.buttons[(j, k)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
-                                                 image=self.startScreenButtons[j],
+                                                 image=self.startScreenButtonImages[j][0],
                                                  state="normal")
                 b = self.buttons[(j, k)]
                 b.grid(row=j, column=k, padx=(10, 10), pady=(10, 10))
@@ -125,44 +126,48 @@ class OutfitRecommenderGUI(tk.Frame):
                 b.bind('<Button-1>', lambda event, x=j, y=k: self.show_all(x))
 
     # Shows all cloth of the chosen type
-    def show_all(self, cloth_name_index):
+    def show_all(self, type_index):
         self.remove_all()
-        for k in range(len(outfitRecommender.filenames[cloth_name_index])):
-            self.buttons[(cloth_name_index, k)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
-                                                            image=self.buttonImages[(cloth_name_index, k)],
-                                                            state="normal")
-            b = self.buttons[(cloth_name_index, k)]
-            b.grid(row=cloth_name_index, column=k, padx=(10, 10), pady=(10, 10))
+        for col in range(len(outfitRecommender.filenames[type_index])):
+            self.buttons[(type_index, col)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
+                                                        image=self.buttonImages[(type_index, col)][0],
+                                                        state="normal")
+            b = self.buttons[(type_index, col)]
+            b.grid(row=type_index, column=col, padx=(10, 10), pady=(10, 10))
             # Left-Click
-            b.bind('<Button-1>', lambda event, x=cloth_name_index, y=k: self.show_recommendations(x, y))
+            b.bind('<Button-1>', lambda event, x=type_index, y=col: self.show_recommendations(x, self.buttonImages[(
+                x, y)]))
 
     # Shows the recommendations for the selected piece
-    def show_recommendations(self, r, c):
+    def show_recommendations(self, r, selected_piece):
         self.remove_all()
-        self.selectedPieces[r] = self.buttonImages[(r, c)]
+        self.selectedPieces[r] = selected_piece[0]
         self.show_selected_pieces()
         if self.piecesSelected < 3:
             self.piecesSelected += 1
             if r != 3:
-                next_cloth = outfitRecommender.getNextCloth(self.clothNames[r], outfitRecommender.filenames[r][c],
+                next_cloth = outfitRecommender.getNextCloth(self.clothNames[r], selected_piece[2],
                                                             self.clothNames[r + 1])
                 r = r + 1
             else:
-                next_cloth = outfitRecommender.getNextCloth(self.clothNames[r], outfitRecommender.filenames[r][c],
+                next_cloth = outfitRecommender.getNextCloth(self.clothNames[r], selected_piece[2],
                                                             self.clothNames[0])
                 r = 0
             print (next_cloth)
             for k in range(len(next_cloth)):
-                self.original = Image.open(self.filenamePrefixes[r] + next_cloth[k][0])
-                resized = self.original.resize((self.buttonSize, self.buttonSize), Image.ANTIALIAS)
-                self.recommendedImages[(r, k)] = ImageTk.PhotoImage(resized)
+                image_path_prefix = self.filenamePrefixes[r]
+                image_path = next_cloth[k][0]
+                original = Image.open(image_path_prefix + image_path)
+                resized = original.resize((self.buttonSize, self.buttonSize), Image.ANTIALIAS)
+                self.recommendedImages[(r, k)] = [ImageTk.PhotoImage(resized), image_path_prefix, image_path]
                 self.buttons[(r, k)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
-                                                 image=self.recommendedImages[(r, k)],
+                                                 image=self.recommendedImages[(r, k)][0],
                                                  state="normal")
                 b = self.buttons[(r, k)]
                 b.grid(row=r, column=k, padx=(10, 10), pady=(10, 10))
                 # Left-Click
-                b.bind('<Button-1>', lambda event, x=r, y=k: self.show_recommendations(x, y))
+                b.bind('<Button-1>',
+                       lambda event, x=r, y=k: self.show_recommendations(x, self.recommendedImages[(x, y)]))
         else:
             self.__showOutfitFinishedDialogue__()
 
