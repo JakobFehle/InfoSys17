@@ -100,7 +100,7 @@ class OutfitRecommenderGUI(tk.Frame):
         # removes all buttons from the list
         self.buttons.clear()
 
-    # Private function for keeping the size of the window // will be obsolete when show_all uses multiple rows
+    # Private function for keeping the size of the window
     def __resize__(self):
         root.geometry('{}x{}'.format(self.windowSize[0], self.windowSize[1]))
 
