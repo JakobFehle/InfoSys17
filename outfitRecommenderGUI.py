@@ -8,7 +8,7 @@ import outfitRecommender
 
 
 class OutfitRecommenderGUI(tk.Frame):
-    # size of GUI related elements
+    # sizes of GUI related elements
     windowSize = [1366, 768]
     buttonSize = 160
 
@@ -27,7 +27,7 @@ class OutfitRecommenderGUI(tk.Frame):
         self.root = root
         self.grid(sticky=tk.N + tk.S + tk.E + tk.W)
 
-        # Initializing the buttons representing the cloth pieces
+        # Initializing the images representing the cloth pieces
         self.__initButtonImages__()
 
         # contains every button shown in the frame
@@ -35,7 +35,7 @@ class OutfitRecommenderGUI(tk.Frame):
 
         self.__initUI__()
 
-    # Initializes the buttons representing the cloth pieces
+    # Initializes the images representing the cloth pieces
     def __initButtonImages__(self):
         for j in range(len(outfitRecommender.filenames)):
             for k in range(len(outfitRecommender.filenames[j])):
@@ -43,11 +43,12 @@ class OutfitRecommenderGUI(tk.Frame):
                 resized = self.original.resize((self.buttonSize, self.buttonSize), Image.ANTIALIAS)
                 self.buttonImages[(j, k)] = ImageTk.PhotoImage(resized)
 
-        # The first four cloth pieces to be shown // buttons need to safe the path to the image for correct behaviour
+        # The first four cloth pieces to be shown (representing the four different cloth types)
+        # Is needed, because buttons need to save the path to the image for correct behaviour
         self.startScreenButtons = [self.buttonImages[(0, 0)], self.buttonImages[(1, 0)], self.buttonImages[(2, 0)],
                                    self.buttonImages[(3, 0)]]
 
-    # sets up the window and its menu-bar
+    # Sets up the window and its menu-bar
     def __initUI__(self):
         # size of a 720p display
         self.root.minsize(width=self.windowSize[0], height=self.windowSize[1])
@@ -76,37 +77,41 @@ class OutfitRecommenderGUI(tk.Frame):
 
         self.root.config(menu=menu_main)
 
+    # Shows a short dialogue asking the user, if he really wants to quit the application and closes the app on approval
     def on_quit(self):
         if tkMessageBox.askokcancel("Quit", "Do you really wish to quit?"):
             root.destroy()
 
+    # Resets the frame without destroying it
     def new_recommendation(self, row, col):
         self.remove_all()
         self.__resize__()
-        self.__initSelectedPieces__()
+        self.__initSelected__()
         self.init_grid(row, col)
 
+    # Clears the frame without destroying the frame itself:
+    # http://stackoverflow.com/questions/15781802/python-tkinter-clearing-a-frame
     def remove_all(self):
-        # clears the frame without destroying the frame itself:
-        # http://stackoverflow.com/questions/15781802/python-tkinter-clearing-a-frame
         for widget in self.winfo_children():
             widget.destroy()
 
         # removes all buttons from the list
         self.buttons.clear()
 
-    # private function for keeping the size of the window // will be obsolete when show_all uses multiple rows
+    # Private function for keeping the size of the window // will be obsolete when show_all uses multiple rows
     def __resize__(self):
         root.geometry('{}x{}'.format(self.windowSize[0], self.windowSize[1]))
 
-    def __initSelectedPieces__(self):
+    # Sets the initial values for selectedPieces and piecesSelected
+    def __initSelected__(self):
         # list for saving selected Outfit
         self.selectedPieces = [0, 0, 0, 0]
 
-        # counts the number of pieces selected by the user // show dialog when the last piece is selected
+        # counts the number of pieces selected by the user
+        # used to observe if the user already selected four pieces (one of each type)
         self.piecesSelected = 0
 
-    # initializes grid UI and fills it with the cloth-buttons
+    # Initializes grid UI and fills it with the start-buttons
     def init_grid(self, row, col):
         for j in range(row):
             for k in range(col):
@@ -118,7 +123,7 @@ class OutfitRecommenderGUI(tk.Frame):
                 # Left-Click
                 b.bind('<Button-1>', lambda event, x=j, y=k: self.show_all(x))
 
-    # needs to remove all buttons currently in the frame
+    # Shows all cloth of the chosen type
     def show_all(self, cloth_name_index):
         self.remove_all()
         for k in range(len(outfitRecommender.filenames[cloth_name_index])):
@@ -130,15 +135,7 @@ class OutfitRecommenderGUI(tk.Frame):
             # Left-Click
             b.bind('<Button-1>', lambda event, x=cloth_name_index, y=k: self.show_recommendations(x, y))
 
-    def show_selected_pieces(self):
-        for row in range(len(self.selectedPieces)):
-            if self.selectedPieces[row] != 0:
-                self.buttons[(row, 0)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
-                                                   image=self.selectedPieces[row],
-                                                   state="normal")
-                b = self.buttons[(row, 0)]
-                b.grid(row=row, column=0, padx=(10, 10), pady=(10, 10))
-
+    # Shows the recommendations for the selected piece
     def show_recommendations(self, r, c):
         self.remove_all()
         self.selectedPieces[r] = self.buttonImages[(r, c)]
@@ -165,6 +162,16 @@ class OutfitRecommenderGUI(tk.Frame):
                 b.grid(row=r, column=k, padx=(10, 10), pady=(10, 10))
                 # Left-Click
                 b.bind('<Button-1>', lambda event, x=r, y=k: self.show_recommendations(x, y))
+
+    # Shows all the pieces selected by the user
+    def show_selected_pieces(self):
+        for row in range(len(self.selectedPieces)):
+            if self.selectedPieces[row] != 0:
+                self.buttons[(row, 0)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
+                                                   image=self.selectedPieces[row],
+                                                   state="normal")
+                b = self.buttons[(row, 0)]
+                b.grid(row=row, column=0, padx=(10, 10), pady=(10, 10))
 
 
 root = tk.Tk()
