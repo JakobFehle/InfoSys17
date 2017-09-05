@@ -25,7 +25,7 @@ class OutfitRecommenderGUI(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-        self.grid(sticky=tk.N + tk.S + tk.E + tk.W)
+        self.grid(sticky='nsew')
 
         # Initializing the images representing the cloth pieces
         self.__initButtonImages__()
@@ -129,11 +129,21 @@ class OutfitRecommenderGUI(tk.Frame):
     def show_all(self, type_index):
         self.remove_all()
         for col in range(len(outfitRecommender.filenames[type_index])):
-            self.buttons[(type_index, col)] = tk.Button(self, width=self.buttonSize, height=self.buttonSize,
-                                                        image=self.buttonImages[(type_index, col)][0],
-                                                        state="normal")
-            b = self.buttons[(type_index, col)]
-            b.grid(row=type_index, column=col, padx=(10, 10), pady=(10, 10))
+            if col < 7:
+                row_offset = 0
+            elif col < 14:
+                row_offset = 1
+            elif col < 21:
+                row_offset = 2
+            button_row = type_index + row_offset
+            button_col = col - (row_offset * 7)
+            self.buttons[(button_row, button_col)] = tk.Button(self, width=self.buttonSize,
+                                                               height=self.buttonSize,
+                                                               image=self.buttonImages[
+                                                                   (type_index, col)][0],
+                                                               state="normal")
+            b = self.buttons[(button_row, button_col)]
+            b.grid(row=button_row, column=button_col, padx=(10, 10), pady=(10, 10))
             # Left-Click
             b.bind('<Button-1>', lambda event, x=type_index, y=col: self.show_recommendations(x, self.buttonImages[(
                 x, y)]))
