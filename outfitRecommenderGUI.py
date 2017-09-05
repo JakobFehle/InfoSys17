@@ -39,7 +39,8 @@ class OutfitRecommenderGUI(tk.Frame):
     def __initButtonImages__(self):
         for j in range(len(outfitRecommender.filenames)):
             for k in range(len(outfitRecommender.filenames[j])):
-                self.original = Image.open(self.filenamePrefixes[j] + outfitRecommender.filenames[j][k])
+                image_path = self.filenamePrefixes[j] + outfitRecommender.filenames[j][k]
+                self.original = Image.open(image_path)
                 resized = self.original.resize((self.buttonSize, self.buttonSize), Image.ANTIALIAS)
                 self.buttonImages[(j, k)] = ImageTk.PhotoImage(resized)
 
@@ -162,6 +163,13 @@ class OutfitRecommenderGUI(tk.Frame):
                 b.grid(row=r, column=k, padx=(10, 10), pady=(10, 10))
                 # Left-Click
                 b.bind('<Button-1>', lambda event, x=r, y=k: self.show_recommendations(x, y))
+        else:
+            self.__showOutfitFinishedDialogue__()
+
+    # Shows the user a dialogue telling him/her that the outfit is complete
+    def __showOutfitFinishedDialogue__(self):
+        if tkMessageBox.askyesno("Outfit completed", "Your outfit is completed!\nDo you want to create another one?"):
+            self.new_recommendation(4, 1)
 
     # Shows all the pieces selected by the user
     def show_selected_pieces(self):
